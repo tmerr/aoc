@@ -10,7 +10,6 @@ def number_at(line, i):
     start = i
     while i < len(line) and line[i].isnumeric():
         i += 1
-    end = i
     return int(line[start:i]), start
 
 
