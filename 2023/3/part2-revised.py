@@ -26,6 +26,8 @@ def solution(lines):
             ]
             distinct = set()
             for ni, nj in adj:
+                if not (0 <= ni < len(line) and 0 <= nj < len(lines)):
+                    continue
                 got = number_at(lines[nj], ni)
                 if got is not None:
                     # consider numbers with the same value at different
