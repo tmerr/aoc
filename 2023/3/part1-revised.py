@@ -1,3 +1,10 @@
+# Note if we care about time complexity this isn't the best: consider inputs like
+#   3333333333333333333333333333333333333333333333333333
+#   ****************************************************
+# For each star the original algorithm would scan through every '3' to find
+# the full number. part1-optimized.py is an improvement on time and space complexity
+# but code is hairier.
+
 def number_at(line, i):
     # returns the number and start offet.
     if not line[i].isnumeric():

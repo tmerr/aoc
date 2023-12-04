@@ -8,6 +8,7 @@
 # position to some uniquely identified integer (an 'Entry' python
 # object).
 
+
 import re
 
 
@@ -92,11 +93,9 @@ def solution(fname):
             line = next(it)
         except StopIteration:
             break
-        window = [
-            window[1],
-            window[2],
-            parse(line),
-        ]
+        window[0] = window[1]
+        window[1] = window[2]
+        window[2] = parse(line)
     return s
 
 
