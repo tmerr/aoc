@@ -48,9 +48,8 @@ def parse(line):
         for i in range(start, end):
             number_lookup[i] = entry
     for i, ch in enumerate(line):
-        if ch.isnumeric() or ch == '.':
-            continue
-        symbols.append(i)
+        if ch == '*':
+            symbols.append(i)
     return ParsedLine(symbols, number_lookup)
 
 
