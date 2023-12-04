@@ -17,16 +17,14 @@ import re
 class Entry:
     def __init__(self, num):
         self.num = num
+        # prevents double-counting a number.
         self.seen = False
 
 
 def parse(txt):
     # generates
     # - List of symbol coordinates.
-    # - A lookup table of numbers. Each entry is
-    #   (value, line no, start offset, seen marker).
-    #   The seen marker is used by later logic to mark
-    #   that a number has been counted.
+    # - A lookup table of numbers.
     lines = txt.strip().split()
     lookup_table = [[None for ch in line] for line in lines]
     symbols = []
