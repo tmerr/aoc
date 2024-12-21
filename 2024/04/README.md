@@ -12,8 +12,8 @@ X M A S, rooted at X. For example
 . . . X M A S
 ```
 
-Would have two solutions. One rooted at (X=3, Y=0) in direction (1, 0),
-and the other rooted at (3, 0) in direction (0, -1).
+Would have two solutions. One rooted at (X=3, Y=3) in direction (1, 0),
+and the other rooted at (3, 3) in direction (0, -1).
 
 ## Part 2
 
