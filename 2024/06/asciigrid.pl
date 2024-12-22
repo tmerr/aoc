@@ -1,9 +1,11 @@
 :- module(asciigrid, [
     file_contents/1,
-    list_as_grid/2,
-    grid_tile/4,
-    in_bounds_bool/4,
-    coord_as_index/5
+    codes_as_grid/2,
+    list_as_grid/3,
+    grid_tile/3,
+    replace_grid_tile/4,
+    in_bounds_bool/3,
+    coord_as_index/3
 ]).
 
 :- use_module(library(clpfd)).
@@ -20,23 +22,45 @@ remove_newlines([H|T], [H|O], Acc, LineLength) :-
     Acc1 #= Acc + 1,
     remove_newlines(T, O, Acc1, LineLength).
 
-list_as_grid(Codes, grid(Tree, Width, Height)) :-
+codes_as_grid(Codes, G) :-
     remove_newlines(Codes, FlatList, 0, Width),
     length(FlatList, Len),
     Height #= Len // Width,
-    list_as_tree(FlatList, Tree).
+    list_as_grid(FlatList, [Width, Height], G).
 
-coord_as_index(Width, Height, X, Y, Index) :-
-    X #>= 0, X #< Width,
-    Y #>= 0, Y #< Height,
-    Index #= Y * Width + X.
+list_as_grid(List, Dims, grid(Tree, Dims)) :-
+    list_as_tree(List, Tree).
 
-grid_tile(grid(Tree, Width, Height), X, Y, Code) :-
-    coord_as_index(Width, Height, X, Y, Index),
+component_in_bounds(Dim, Component) :-
+    Component #>= 0, Component #< Dim.
+
+calc_index([], _, [], 0).
+calc_index([D|Dims], Factor, [Ix|Ixes], Out) :-
+    Out #= Out1 + Factor * Ix,
+    Factor1 #= D * Factor,
+    calc_index(Dims, Factor1, Ixes, Out1).
+
+coord_as_index(Dims, Coord, Index) :-
+    maplist(component_in_bounds, Dims, Coord),
+    calc_index(Dims, 1, Coord, Index).
+
+grid_tile(grid(Tree, Dims), Coord, Code) :-
+    coord_as_index(Dims, Coord, Index),
+    label(Coord),
+    label([Index]),
     tree_nth0(Tree, Index, Code).
+
+replace_grid_tile(grid(T1, Dims), Coord, Code, grid(T2, Dims)) :-
+    coord_as_index(Dims, Coord, Index),
+    replace_nth0(T1, Index, Code, T2).
+
+build_bounds_check([D], [C], (C #>= 0) #/\ (C #< D)).
+build_bounds_check([D,D2|Dims], [C,C2|Coord], ((C #>= 0) #/\ (C #< D)) #/\ T) :-
+    build_bounds_check([D2|Dims], [C2|Coord], T).
 
 bin_as_bool(0, false).
 bin_as_bool(1, true).
-in_bounds_bool(grid(_, Width, Height), X, Y, Result) :-
-    ((X #>= 0) #/\ (X #< Width) #/\ (Y #>= 0) #/\ (Y #< Height)) #<==> B,
+in_bounds_bool(grid(_, Dims), Coord, Result) :-
+    build_bounds_check(Dims, Coord, ClpdExpression),
+    ClpdExpression #<==> B,
     bin_as_bool(B, Result).

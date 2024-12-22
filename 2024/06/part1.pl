@@ -3,41 +3,47 @@
 :- use_module(arraytree).
 :- use_module(asciigrid).
 
-start_position(Grid, X, Y) :-
-    grid_tile(Grid, X, Y, 0'^).
+start_position(Grid, Pos) :-
+    grid_tile(Grid, Pos, 0'^).
 
-rot90(X, Y, X1, X) :- 
+rot90([X, Y], [X1, X]) :- 
     X1 #= -Y.
 
-walk(Grid, X, Y, DX, DY, Path) :-
-    AheadX #= X + DX,
-    AheadY #= Y + DY,
-    if_(in_bounds_bool(Grid, AheadX, AheadY),
+component_add(C1, C2, C3) :-
+    C3 #= C1 + C2.
+
+vec_add(U, V, W) :-
+    maplist(component_add, U, V, W).
+
+walk(Grid, Pos, Facing, Visited, VisitedOut) :-
+    vec_add(Pos, Facing, Ahead),
+    if_(in_bounds_bool(Grid, Ahead),
         (
-            grid_tile(Grid, AheadX, AheadY, AheadTile),
+            grid_tile(Grid, Ahead, AheadTile),
             if_(AheadTile = 0'#,
                 (
-                    rot90(DX, DY, DX1, DY2),
-                    walk(Grid, X, Y, DX1, DY2, Path)
+                    rot90(Facing, Facing1),
+                    walk(Grid, Pos, Facing1, Visited, VisitedOut)
                 ),
                 (
-                    Path = [(X, Y)|Path1],
-                    walk(Grid, AheadX, AheadY, DX, DY, Path1)
+                    replace_grid_tile(Visited, Pos, 1, Visited1),
+                    walk(Grid, Ahead, Facing, Visited1, VisitedOut)
                 ))
         ),
-        Path = [(X, Y)]).
-
-coord_as_index_helper(Width, Height, (X, Y), Index) :-
-    coord_as_index(Width, Height, X, Y, Index).
+        replace_grid_tile(Visited, Pos, 1, VisitedOut)).
 
 solution(I) :-
     file_contents(Codes),
-    list_as_grid(Codes, G),
-    start_position(G, X, Y),
-    walk(G, X, Y, 0, -1, Path),
-    grid(_, Width, Height) = G,
-    % A quick hack: convert grid coordinates to integers and get the
-    % size of the set.
-    maplist(coord_as_index_helper(Width, Height), Path, Indices),
-    list_to_fdset(Indices, Fdset),
-    fdset_size(Fdset, I).
+
+    codes_as_grid(Codes, G),
+    grid(_, [Width, Height]) = G,
+    VisitedLen #= Width * Height,
+    length(VisitedList, VisitedLen),
+    maplist(=(0), VisitedList),
+    list_as_grid(VisitedList, [Width, Height], Visited),
+
+    start_position(G, Pos),
+    walk(G, Pos, [0, -1], Visited, VisitedOut),
+    length(VisitedOutList, VisitedLen),
+    list_as_grid(VisitedOutList, [Width, Height], VisitedOut),
+    sum(VisitedOutList, #=, I).

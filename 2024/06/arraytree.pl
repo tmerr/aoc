@@ -74,7 +74,7 @@ replace_nth0(arraytree([L], Depth), Index, Value, arraytree([L1], Depth)) :-
     Depth #> 0,
     Depth1 #= Depth - 1,
     Index #< 2 ^ (Depth - 1),
-    replace_nth0(arraytree(L, Depth1), Index, Value, arraytree([L1], Depth)).
+    replace_nth0(arraytree(L, Depth1), Index, Value, arraytree(L1, Depth1)).
 replace_nth0(
     arraytree([L, R], Depth),
     Index,
