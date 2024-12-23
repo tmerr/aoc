@@ -30,7 +30,7 @@ walk(Grid, Pos, Facing, Visited, HasCycle) :-
         (
             replace_grid_tile(Visited, VisitedKey, 1, Visited1),
             vec_add(Pos, Facing, Ahead),
-            if_(in_bounds_bool(Grid, Ahead),
+            if_(fast_impure_in_bounds_bool(Grid, Ahead),
                 (
                     grid_tile(Grid, Ahead, AheadTile),
                     if_(AheadTile = 0'#,
@@ -81,7 +81,7 @@ solution(Sum) :-
     findall(
         [X, Y],
         (
-            X in 0..Width1, Y in 0..Height1,
+            X in 0..20, Y in 0,
             label([X, Y]),
             replace_grid_tile(G, [X, Y], 0'#, G1),
             walk(G1, Pos, [0, -1], Visited, /* HasCycle */ 1)

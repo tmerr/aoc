@@ -5,6 +5,7 @@
     grid_tile/3,
     replace_grid_tile/4,
     in_bounds_bool/3,
+    fast_impure_in_bounds_bool/3,
     coord_as_index/3
 ]).
 
@@ -34,15 +35,15 @@ list_as_grid(List, Dims, grid(Tree, Dims)) :-
 component_in_bounds(Dim, Component) :-
     Component #>= 0, Component #< Dim.
 
-calc_index([], _, [], 0).
-calc_index([D|Dims], Factor, [Ix|Ixes], Out) :-
-    Out #= Out1 + Factor * Ix,
+calc_index([], _, [], Acc, Acc).
+calc_index([D|Dims], Factor, [Ix|Ixes], Acc, Out) :-
+    Acc1 #= Acc + Factor * Ix,
     Factor1 #= D * Factor,
-    calc_index(Dims, Factor1, Ixes, Out1).
+    calc_index(Dims, Factor1, Ixes, Acc1, Out).
 
 coord_as_index(Dims, Coord, Index) :-
     maplist(component_in_bounds, Dims, Coord),
-    calc_index(Dims, 1, Coord, Index).
+    calc_index(Dims, 1, Coord, 0, Index).
 
 grid_tile(grid(Tree, Dims), Coord, Code) :-
     coord_as_index(Dims, Coord, Index),
@@ -64,3 +65,9 @@ in_bounds_bool(grid(_, Dims), Coord, Result) :-
     build_bounds_check(Dims, Coord, ClpdExpression),
     ClpdExpression #<==> B,
     bin_as_bool(B, Result).
+
+% A hack because CLPFD reification is really slow.
+fast_impure_in_bounds_bool(grid(_, Dims), Coord, Result) :-
+    (maplist(component_in_bounds, Dims, Coord) 
+    -> Result = true
+    ; Result = false).

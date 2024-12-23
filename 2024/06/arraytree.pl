@@ -20,16 +20,17 @@
 :- use_module(library(clpfd)).
 
 nest([], []).
-nest([A], [[A]]).
-nest([A|[B|C]], [[A, B]|Nested]) :-
+nest([A], [t(A)]).
+nest([A|[B|C]], [t(A, B)|Nested]) :-
     nest(C, Nested).
 
-repeated_nest([Tree], Tree, 0).
-repeated_nest([A|B], Tree, N1) :-
-    N1 #> 0,
+repeated_nest([t(A, B)], t(A, B), 0).
+repeated_nest([t(A)], t(A), 0).
+repeated_nest([A|B], Tree, Depth) :-
+    Depth #> 0,
     nest([A|B], Nested),
-    N #= N1 - 1,
-    repeated_nest(Nested, Tree, N).
+    Depth1 #= Depth - 1,
+    repeated_nest(Nested, Tree, Depth1).
 
 depth_for_length(1, 1).
 depth_for_length(Len, Depth) :-
@@ -46,41 +47,40 @@ list_as_tree(List, arraytree(Tree, Depth)) :-
     length(List, Len),
     repeated_nest(List, Tree, Depth).
 
-tree_nth0(arraytree(L, 0), 0, L).
-tree_nth0(arraytree([L], Depth), Index, Value) :-
+tree_nth0(L, 0, 0, L).
+tree_nth0(t(L), Depth, Index, Value) :-
     Depth #> 0,
     Depth1 #= Depth - 1,
     Index #< 2 ^ (Depth - 1),
-    tree_nth0(arraytree(L, Depth1), Index, Value).
-tree_nth0(arraytree([L, R], Depth), Index, Value) :-
+    tree_nth0(L, Depth1, Index, Value).
+tree_nth0(t(L, R), Depth, Index, Value) :-
     Depth #> 0,
     Depth1 #= Depth - 1,
     Index1 #= Index - (2 ^ Depth1),
     (
         (
             Index1 #< 0,
-            tree_nth0(arraytree(L, Depth1), Index, Value)
+            tree_nth0(L, Depth1, Index, Value)
         )
         ;
         (
             Index1 #>= 0,
-            tree_nth0(arraytree(R, Depth1), Index1, Value)
+            tree_nth0(R, Depth1, Index1, Value)
         )
     ).
+tree_nth0(arraytree(T, Depth), Index, Value) :-
+    tree_nth0(T, Depth, Index, Value).
 
 % replace_nth0(T, Index, Value, T1) is true if T1 is T with the given element replaced.
-replace_nth0(arraytree(_, 0), 0, V, arraytree(V, 0)).
-replace_nth0(arraytree([L], Depth), Index, Value, arraytree([L1], Depth)) :-
+replace_nth0(arraytree(T, Depth), Index, Value, arraytree(T1, Depth)) :-
+    replace_nth0(T, Depth, Index, Value, T1).
+replace_nth0(_, 0, 0, V, V).
+replace_nth0(t(L), Depth, Index, Value, t(L1)) :-
     Depth #> 0,
     Depth1 #= Depth - 1,
     Index #< 2 ^ (Depth - 1),
-    replace_nth0(arraytree(L, Depth1), Index, Value, arraytree(L1, Depth1)).
-replace_nth0(
-    arraytree([L, R], Depth),
-    Index,
-    Value,
-    arraytree([L1, R1], Depth)) :-
-
+    replace_nth0(L, Depth1, Index, Value, L1).
+replace_nth0(t(L, R), Depth, Index, Value, t(L1, R1)) :-
     Depth #> 0,
     Depth1 #= Depth - 1,
     Index1 #= Index - (2 ^ Depth1),
@@ -88,12 +88,12 @@ replace_nth0(
         (
             Index1 #< 0,
             R1 = R,
-            replace_nth0(arraytree(L, Depth1), Index, Value, arraytree(L1, Depth1))
+            replace_nth0(L, Depth1, Index, Value, L1)
         )
         ;
         (
             Index1 #>= 0,
             L1 = L,
-            replace_nth0(arraytree(R, Depth1), Index1, Value, arraytree(R1, Depth1))
+            replace_nth0(R, Depth1, Index1, Value, R1)
         )
     ).
