@@ -46,6 +46,8 @@ tokens_to_win(machine([Ax, Ay], [Bx, By], [Px, Py]), Out) :-
                 Out = 0
             )
         ),
+        % Come to think of it, this probably isn't the right way to
+        % handle this edge case. Perhaps the input didn't exercise it.
         Out = 0).
 
 tokens_spent(Machines, Sum) :- 

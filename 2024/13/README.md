@@ -9,5 +9,4 @@ Solve for `a`, `b` in `P = a*U + b*V`. Another way to look at that is
 |Py| = |Uy Vy| * |b|
 ```
 
-Multiplying both sides by the inverse matrix gives the amount of steps in the `a` and `b` direction, and the number of tokens is `3a + b`. If the inverse matrix doesn't exist, that
-means the machine is not winnable.
+Multiplying both sides by the inverse matrix gives the amount of steps in the `a` and `b` direction, then the number of tokens is `3|a| + |b|`. The machine is only winnable if `a` and `b` are whole numbers.
