@@ -24,7 +24,7 @@ grid_as_state(Grid, state(Grid1, BotPos)) :-
     grid_tile(Grid, BotPos, 0'@),
     replace_grid_tile(Grid, BotPos, 0'., Grid1).
 
-append_boulder(Grid, Pos, Delta, Grid1, OK) :-
+append_box(Grid, Pos, Delta, Grid1, OK) :-
     grid_tile(Grid, Pos, Char),
     if_(Char = 0'.,
     (
@@ -34,22 +34,22 @@ append_boulder(Grid, Pos, Delta, Grid1, OK) :-
     if_(Char = 0'O,
     (
         vec_add(Pos, Delta, Pos1),
-        append_boulder(Grid, Pos1, Delta, Grid1, OK)
+        append_box(Grid, Pos1, Delta, Grid1, OK)
     ),
     (
         OK = false,
         Grid = Grid1
     ))).
 
-push_boulder(Grid, Pos, Delta, Grid1, OK) :-
-    append_boulder(Grid, Pos, Delta, Grid0, OK),
+push_box(Grid, Pos, Delta, Grid1, OK) :-
+    append_box(Grid, Pos, Delta, Grid0, OK),
     if_(OK = true,
         replace_grid_tile(Grid0, Pos, 0'., Grid1),
         Grid1 = Grid).
 
 move_bot(state(Grid, BotPos), Delta, state(Grid1, BotPos1)) :-
     vec_add(BotPos, Delta, Ahead),
-    push_boulder(Grid, Ahead, Delta, Grid1, OK),
+    push_box(Grid, Ahead, Delta, Grid1, OK),
     if_(OK = true,
         vec_add(BotPos, Delta, BotPos1),
         BotPos1 = BotPos).

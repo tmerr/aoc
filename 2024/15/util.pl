@@ -6,13 +6,13 @@
 :- use_module(library(clpfd)).
 :- use_module(library(reif)).
 
-distribute(_, [], []).
-distribute(X, [Y|Ys], [[X, Y]|Zs]) :-
-    distribute(X, Ys, Zs).
+distribute(d(_), [], []).
+distribute(d(X), [Y|Ys], [[X, Y]|Zs]) :-
+    distribute(d(X), Ys, Zs).
 
 cartesian_product([], _, []).
 cartesian_product([X|Xs], Ys, Zs) :-
-    distribute(X, Ys, Z),
+    distribute(d(X), Ys, Z),
     append(Z, Zs1, Zs),
     cartesian_product(Xs, Ys, Zs1).
 
