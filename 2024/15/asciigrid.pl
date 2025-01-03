@@ -2,6 +2,7 @@
     grid_grammar/3,
     list_as_grid/3,
     grid_tile/3,
+    grid_enumerate/2,
     replace_grid_tile/4,
     in_bounds_bool/3,
     fast_impure_in_bounds_bool/3,
@@ -12,6 +13,7 @@
 :- use_module(library(clpfd)).
 :- use_module(library(reif)).
 :- use_module(arraytree).
+:- use_module(util).
 
 grid_grammar(grid(T, [W, H])) -->
     {
@@ -91,3 +93,12 @@ fast_impure_in_bounds_bool(grid(_, Dims), Coord, Result) :-
     (maplist(component_in_bounds, Dims, Coord) 
     -> Result = true
     ; Result = false).
+
+enum_item(G, Coord, item(Coord, Char)) :-
+    grid_tile(G, Coord, Char).
+grid_enumerate(Grid, Result) :-
+    grid(_, [W, H]) = Grid,
+    num_range(0, W, XRange),
+    num_range(0, H, YRange),
+    cartesian_product(XRange, YRange, Coords),
+    maplist(enum_item(Grid), Coords, Result).

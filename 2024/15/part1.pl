@@ -57,18 +57,14 @@ move_bot(state(Grid, BotPos), Delta, state(Grid1, BotPos1)) :-
 moves(S, S) --> [].
 moves(S, SFinal) --> [Delta], { move_bot(S, Delta, S1) }, moves(S1, SFinal).
 
-tile_contribution(Grid, [X, Y], Contribution) :-
-    grid_tile(Grid, [X, Y], Char),
+tile_contribution(item([X, Y], Char), Contribution) :-
     if_(Char = 0'O,
         Contribution #= 100 * Y + X,
         Contribution #= 0).
 
 sum_box_gps_coordinates(state(Grid, _), Sum) :-
-    grid(_, [W, H])= Grid,
-    num_range(0, W, XRange),
-    num_range(0, H, YRange),
-    cartesian_product(XRange, YRange, Coords),
-    maplist(tile_contribution(Grid), Coords, Contributions),
+    grid_enumerate(Grid, Items),
+    maplist(tile_contribution, Items, Contributions),
     sum(Contributions, #=, Sum).
 
 solution :-
