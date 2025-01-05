@@ -1,8 +1,8 @@
 :- use_module(library(clpfd)).
 :- use_module(library(reif)).
 :- use_module(library(dcg/basics)).
-:- use_module(asciigrid).
-:- use_module(util).
+:- use_module('../lib/asciigrid').
+:- use_module('../lib/util').
 
 preprocess_grammar([0'\n|T]) --> `\n`, preprocess_grammar(T).
 preprocess_grammar([0'#, 0'#|T]) --> `#`, preprocess_grammar(T).
