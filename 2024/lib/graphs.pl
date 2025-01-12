@@ -28,7 +28,11 @@ dijkstras(EdgesPred, Start, End, Cost) :-
     singleton_heap(Frontier, 0, node(Start, null)),
     rb_empty(Parents),
     dijkstras_(EdgesPred, Frontier, Parents, ParentsOut),
-    rb_in(End, (_, Cost), ParentsOut).
+    (
+    rb_in(End, (_, Cost), ParentsOut)
+        -> true
+        ; Cost = inf
+    ).
 
 :- meta_predicate dijkstras_all_paths_(0, ?, ?, ?).
 dijkstras_all_paths_(EdgesPred, Frontier, Parents, ParentsOut) :-
