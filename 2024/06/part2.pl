@@ -1,7 +1,6 @@
 :- use_module(library(clpfd)).
 :- use_module(library(reif)).
-:- use_module(arraytree).
-:- use_module(asciigrid).
+:- use_module('../lib/asciigrid.pl').
 :- use_module(part1).
 
 start_position(Grid, Pos) :-
@@ -34,7 +33,7 @@ walk(Grid, Pos, Facing, Visited, HasCycle) :-
         (
             replace_grid_tile(Visited, VisitedKey, 1, Visited1),
             vec_add(Pos, Facing, Ahead),
-            if_(fast_impure_in_bounds_bool(Grid, Ahead),
+            if_(in_bounds_bool(Grid, Ahead),
                 (
                     grid_tile(Grid, Ahead, AheadTile),
                     if_(AheadTile = 0'#,
@@ -70,9 +69,7 @@ test_position(G, StartPos, Visited, ObstaclePos, HasCycle) :-
     walk(G1, StartPos, [0, -1], Visited, HasCycle).
 
 solution(Sum) :-
-    file_contents(Codes),
-
-    codes_as_grid(Codes, G),
+    phrase_from_file(grid_grammar(G), "input.txt"),
     grid(_, [Width, Height]) = G,
 
     VisitedDims = [4, Width, Height],

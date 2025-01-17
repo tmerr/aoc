@@ -5,15 +5,15 @@
 
 :- use_module(library(clpfd)).
 :- use_module(library(reif)).
-:- use_module(asciigrid).
-:- use_module(util).
+:- use_module('../lib/asciigrid').
+:- use_module('../lib/util').
 
 adjacents(G, [X, Y], Out) :-
     X1 #= X + 1,
     X2 #= X - 1,
     Y1 #= Y + 1,
     Y2 #= Y - 1,
-    tfilter(fast_impure_in_bounds_bool(G),
+    tfilter(in_bounds_bool(G),
             [[X, Y1], [X, Y2], [X1, Y], [X2, Y]],
             Out).
 
@@ -66,7 +66,7 @@ count_corners([B1,B2,B3|T], N) :-
 
 % B is true when value at Coord is same as WantV, false otherwise.
 eq_as_bool(PG, WantV, Coord, B) :-
-    impure_grid_tile_or(PG, -1, Coord, V),
+    grid_tile_or(PG, -1, Coord, V),
     =(V, WantV, B).
 
 vec_add([X1, Y1], [X2, Y2], [X3, Y3]) :-
@@ -88,8 +88,7 @@ partition_contribution2(PG, Coords, N) :-
     N #= TotalFences * Area.
 
 solution(Part1, Part2) :-
-    file_contents(Codes),
-    codes_as_grid(Codes, G),
+    phrase_from_file(grid_grammar(G), "input.txt"),
     G = grid(_, [W, H]),
     new_partition_id_grid(W, H, PG),
     num_range(0, W, Xs),

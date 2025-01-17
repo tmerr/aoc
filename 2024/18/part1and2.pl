@@ -16,7 +16,7 @@ vec_add([X1, Y1], [X2, Y2], [X3, Y3]) :-
 weight1edge(U, edge(U, 1)).
 
 enterable(G, U, B) :-
-    if_(fast_impure_in_bounds_bool(G, U),
+    if_(in_bounds_bool(G, U),
         (
             grid_tile(G, U, Code),
             =(Code, 0'., B)

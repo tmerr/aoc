@@ -3,8 +3,7 @@
 ]).
 :- use_module(library(clpfd)).
 :- use_module(library(reif)).
-:- use_module(arraytree).
-:- use_module(asciigrid).
+:- use_module('../lib/asciigrid').
 
 start_position(Grid, Pos) :-
     grid_tile(Grid, Pos, 0'^).
@@ -36,9 +35,7 @@ part1_walk(Grid, Pos, Facing, Visited, VisitedOut) :-
         replace_grid_tile(Visited, Pos, 1, VisitedOut)).
 
 solution(I) :-
-    file_contents(Codes),
-
-    codes_as_grid(Codes, G),
+    phrase_from_file(grid_grammar(G), "input.txt"),
     grid(_, [Width, Height]) = G,
     VisitedLen #= Width * Height,
     length(VisitedList, VisitedLen),

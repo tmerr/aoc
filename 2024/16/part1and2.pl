@@ -11,7 +11,7 @@ vec_add([X1, Y1], [X2, Y2], [X3, Y3]) :-
 rot_right([A, B], [NegB, A]) :- NegB #= -B.
 
 legal_state(G, edge(state(U, _), _), Bool) :-
-    if_(fast_impure_in_bounds_bool(G, U),
+    if_(in_bounds_bool(G, U),
     (
         grid_tile(G, U, Char),
         =(Char, 0'., Bool)
