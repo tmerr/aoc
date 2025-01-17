@@ -4,9 +4,9 @@
     grid_tile/3,
     grid_enumerate/2,
     replace_grid_tile/4,
+    in_bounds/2,
     in_bounds_bool/3,
-    fast_impure_in_bounds_bool/3,
-    impure_grid_tile_or/4,
+    grid_tile_or/4,
     coord_as_index/3
 ]).
 
@@ -62,8 +62,8 @@ coord_as_index(Dims, Coord, Index) :-
     maplist(component_in_bounds, Dims, Coord),
     calc_index(Dims, 1, Coord, 0, Index).
 
-impure_grid_tile_or(G, Or, Coord, Code) :-
-    if_(fast_impure_in_bounds_bool(G, Coord),
+grid_tile_or(G, Or, Coord, Code) :-
+    if_(in_bounds_bool(G, Coord),
         grid_tile(G, Coord, Code),
         Code = Or).
 
@@ -81,18 +81,24 @@ build_bounds_check([D], [C], (C #>= 0) #/\ (C #< D)).
 build_bounds_check([D,D2|Dims], [C,C2|Coord], ((C #>= 0) #/\ (C #< D)) #/\ T) :-
     build_bounds_check([D2|Dims], [C2|Coord], T).
 
+in_bounds(grid(_, Dims), Coord) :-
+    maplist(component_in_bounds, Dims, Coord).
+
 bin_as_bool(0, false).
 bin_as_bool(1, true).
 in_bounds_bool(grid(_, Dims), Coord, Result) :-
-    build_bounds_check(Dims, Coord, ClpdExpression),
-    ClpdExpression #<==> B,
-    bin_as_bool(B, Result).
-
-% A hack because CLPFD reification is really slow.
-fast_impure_in_bounds_bool(grid(_, Dims), Coord, Result) :-
-    (maplist(component_in_bounds, Dims, Coord) 
-    -> Result = true
-    ; Result = false).
+    (ground(Coord), ground(Dims))
+    -> (
+        % Fast path because CLPFD reification is slow.
+        (maplist(component_in_bounds, Dims, Coord) 
+        -> Result = true
+        ; Result = false)
+    )
+    ; (
+        build_bounds_check(Dims, Coord, ClpdExpression),
+        ClpdExpression #<==> B,
+        bin_as_bool(B, Result)
+    ).
 
 enum_item(G, Coord, item(Coord, Char)) :-
     grid_tile(G, Coord, Char).
