@@ -2,7 +2,8 @@
     cartesian_product/3,
     num_range/3,
     repeat/3,
-    prefix/3
+    prefix/3,
+    vec_add/3
 ]).
 
 :- use_module(library(clpfd)).
@@ -51,3 +52,7 @@ prefix(N, Prefix, Whole) :-
             N1 #= N - 1,
             prefix(N1, T1, T)
         )).
+
+vec_add([X1, Y1], [X2, Y2], [X3, Y3]) :-
+    X3 #= X1 + X2,
+    Y3 #= Y1 + Y2.
