@@ -51,6 +51,4 @@ def run():
 
 
 if __name__ == '__main__':
-
     run()
-    #print('seconds: {}'.format(time.time() - t0))
