@@ -38,7 +38,6 @@ def run():
 
     height = len(grid)
     width = len(grid[0])
-    import time
     candidates = product(range(height), range(width))
     num_liftable = 0
     while True:
