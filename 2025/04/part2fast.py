@@ -7,6 +7,8 @@ directions = [d for d in product([-1, 0, 1], [-1, 0, 1])
 
 def find_liftable(grid, candidates):
     res = []
+    height = len(grid)
+    width = len(grid[0])
     affected_neighbors = set()
 
     for (j, i) in candidates:
@@ -15,12 +17,9 @@ def find_liftable(grid, candidates):
         adj = []
         for dj, di in directions:
             oj, oi = j+dj, i+di
-            try:
+            if 0 <= oj < height and 0 <= oi < width:
                 if grid[oj][oi] == '@':
                     adj.append((oj, oi))
-            except IndexError:
-                # out of bounds.
-                pass
         if len(adj) < 4:
             affected_neighbors.update(adj)
             res.append((j, i))
